@@ -21,8 +21,8 @@ Describe 'General module control' -Tags 'FunctionalQuality'  {
 #$PrivateFunctions = Get-ChildItem -Path "$modulePath\Private\*.ps1"
 #$PublicFunctions =  Get-ChildItem -Path "$modulePath\Public\*.ps1"
 $allModuleFunctions = @()
-$allModuleFunctions += Get-ChildItem -Path "$modulePath\Private\*.ps1"
-$allModuleFunctions += Get-ChildItem -Path "$modulePath\Public\*.ps1"
+$allModuleFunctions += Get-ChildItem -Path "$modulePath\Private\*.ps1" -ErrorAction SilentlyContinue
+$allModuleFunctions += Get-ChildItem -Path "$modulePath\Public\*.ps1" -ErrorAction SilentlyContinue
 
 if (Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue) {
     $scriptAnalyzerRules = Get-ScriptAnalyzerRule
@@ -36,12 +36,12 @@ else {
     }
 }
 
-foreach ($function in $allModuleFunctions) {
+foreach ($function in $allModuleFunctions.Where{$_}) {
     Describe "Quality for $($function.BaseName)" -Tags 'TestQuality' {
         It "$($function.BaseName) has a unit test" {
             Get-ChildItem "$modulePath\tests\Unit\" -recurse -include "$($function.BaseName).tests.ps1" | Should Not BeNullOrEmpty
         }
-            
+
         if ($scriptAnalyzerRules) {
             It "Script Analyzer for $($function.BaseName)" {
                 forEach ($scriptAnalyzerRule in $scriptAnalyzerRules) {
@@ -69,7 +69,7 @@ foreach ($function in $allModuleFunctions) {
             }
 
             It 'Has at least 1 example' {
-                $FunctionHelp.Examples.Count | Should beGreaterThan 0 
+                $FunctionHelp.Examples.Count | Should beGreaterThan 0
                 $FunctionHelp.Examples[0] | Should match ([regex]::Escape($function.BaseName))
                 $FunctionHelp.Examples[0].Length | Should BeGreaterThan ($function.BaseName.Length + 10)
             }
@@ -83,4 +83,3 @@ foreach ($function in $allModuleFunctions) {
             }
     }
 }
-
