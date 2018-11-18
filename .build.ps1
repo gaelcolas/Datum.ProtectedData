@@ -9,6 +9,8 @@ Param (
     [String]
     $BuildOutput = "BuildOutput",
 
+    $ProjectName = 'Datum.ProtectedData',
+
     [String[]]
     $GalleryRepository,
 
@@ -19,7 +21,7 @@ Param (
     $ForceEnvironmentVariables = [switch]$true,
 
     $MergeList = @('enum*',[PSCustomObject]@{Name='class*';order={(Import-PowerShellDataFile -EA 0 .\*\Classes\classes.psd1).order.indexOf($_.BaseName)}},'priv*','pub*')
-    
+
     ,$TaskHeader = {
         param($Path)
         ''
@@ -44,14 +46,14 @@ Process {
         Invoke-Build $Tasks $MyInvocation.MyCommand.Path @PSBoundParameters
         return
     }
-    
+
     # Loading Build Tasks defined in the .build/ folder
     Get-ChildItem -Path "$PSScriptRoot/.build/" -Recurse -Include *.ps1 -Verbose |
         Foreach-Object {
             "Importing file $($_.BaseName)" | Write-Verbose
-            . $_.FullName 
+            . $_.FullName
         }
-    
+
     # Defining the task header for this Build Job
     if($TaskHeader) { Set-BuildHeader $TaskHeader }
 
@@ -65,7 +67,7 @@ Process {
             Update_Module_Manifest,
             Run_Unit_Tests,
             Upload_Unit_Test_Results_To_AppVeyor,
-            Fail_Build_if_Unit_Test_Failed, 
+            Fail_Build_if_Unit_Test_Failed,
             Fail_if_Last_Code_Converage_is_Under_Threshold,
             IntegrationTests,
             Deploy_with_PSDeploy
@@ -130,7 +132,7 @@ begin {
         $Env:PSModulePath = (Join-Path $BuildOutput 'modules') + ';' + $Env:PSModulePath
     }
 
-    
+
     if ($ResolveDependency) {
         Write-Host "Resolving Dependencies... [this can take a moment]"
         $Params = @{}
