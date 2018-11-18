@@ -51,7 +51,7 @@ Description = 'Datum Handler module to encrypt and decrypt secrets in Datum usin
 # ProcessorArchitecture = ''
 
 # Modules that must be imported into the global environment prior to importing this module
-RequiredModules = @('Datum')
+RequiredModules = @('ProtectedData')
 
 # Assemblies that must be loaded prior to importing this module
 # RequiredAssemblies = @()

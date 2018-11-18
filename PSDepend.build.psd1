@@ -13,5 +13,6 @@
     PSScriptAnalyzer = 'latest'
     PlatyPS          = 'latest'
     psdeploy         = 'latest'
+
     ProtectedData    = 'latest'
 }
