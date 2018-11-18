@@ -6,12 +6,12 @@ $moduleName = Split-Path -Path $modulePath -Leaf
 
 InModuleScope $moduleName {
     Describe Invoke-ProtectedDatumAction {
-       # Mock Get-PrivateFunction { $PrivateData }
+       Mock UnProtect-Datum { $true }
 
-        Context 'True' {
+        Context 'Basic test' {
 
-            It 'true' {
-                $true | Should -be $true
+            It 'The command should return true' {
+                Invoke-ProtectedDatumAction -InputObject "string" -PlainTextPassword 'P@ssw0rd' | Should -be $true
             }
         }
     }

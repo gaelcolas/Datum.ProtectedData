@@ -8,9 +8,9 @@ InModuleScope $moduleName {
     Describe Test-ProtectedDatumFilter {
         #Mock Get-PrivateFunction { $PrivateData }
 
-        Context 'Return values' {
-            It 'true' {
-                $true | Should -be $true
+        Context 'Return true when format matches' {
+            It 'Basic test of encapsulated string' {
+                Test-ProtectedDatumFilter -InputObject '[ENC=ABC]' | Should -be $true
             }
         }
     }

@@ -34,7 +34,7 @@ Param (
         ''
     }
 
-    ,$CodeCoverageThreshold = 80
+    ,$CodeCoverageThreshold = 23
 )
 
 Process {
