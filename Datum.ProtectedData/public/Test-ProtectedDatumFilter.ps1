@@ -1,4 +1,5 @@
-function Test-ProtectedDatumFilter {
+function Test-ProtectedDatumFilter
+{
     <#
     .SYNOPSIS
     Filter function to verify if it's worth triggering the action for the data block.
@@ -14,12 +15,16 @@ function Test-ProtectedDatumFilter {
     $object | Test-ProtectedDatumFilter
 
     #>
-    Param(
+    Param
+    (
         [Parameter(
             ValueFromPipeline
         )]
         $InputObject
     )
 
-    $InputObject -is [string] -and $InputObject.Trim() -match "^\[ENC=[\w\W]*\]$"
+    process
+    {
+        $InputObject -is [string] -and $InputObject.Trim() -match "^\[ENC=[\w\W]*\]$"
+    }
 }

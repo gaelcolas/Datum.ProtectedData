@@ -1,4 +1,5 @@
-function Invoke-ProtectedDatumAction {
+function Invoke-ProtectedDatumAction
+{
     <#
     .SYNOPSIS
     Action that decrypt the secret when the Datum Handler is triggered
@@ -35,8 +36,9 @@ function Invoke-ProtectedDatumAction {
 
     #>
     [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingPlainTextForPassword', '')]
-    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingConvertToSecureStringWithPlainText','')]
-    Param (
+    [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingConvertToSecureStringWithPlainText', '')]
+    Param
+    (
         # Serialized Protected Data represented on Base64 encoding
         [Parameter(
             Mandatory
@@ -82,20 +84,42 @@ function Invoke-ProtectedDatumAction {
         [String]
         $Footer = ']'
     )
-    Write-Debug "Decrypting Datum using ProtectedData"
-    $params = @{}
-    foreach ($ParamKey in $PSBoundParameters.keys) {
-        if ($ParamKey -in @('InputObject', 'PlainTextPassword')) {
-            switch ($ParamKey) {
-                'PlainTextPassword' { $params.add('password', (ConvertTo-SecureString -AsPlainText -Force $PSBoundParameters[$ParamKey])) }
-                'InputObject' { $params.add('Base64Data', $InputObject) }
-            }
-        }
-        else {
-            $params.add($ParamKey, $PSBoundParameters[$ParamKey])
+    begin
+    {
+        if ($null -eq $script:DecryptedPasswords)
+        {
+            $script:DecryptedPasswords = @{}
         }
     }
+    process
+    {
+        Write-Debug "Decrypting Datum using ProtectedData"
+        if ($script:DecryptedPasswords.ContainsKey($InputObject))
+        {
+            return $script:DecryptedPasswords.$InputObject
+        }
+        else
+        {
+            $params = @{}
+            foreach ($ParamKey in $PSBoundParameters.keys)
+            {
+                if ($ParamKey -in @('InputObject', 'PlainTextPassword'))
+                {
+                    switch ($ParamKey)
+                    {
+                        'PlainTextPassword' { $params.add('password', (ConvertTo-SecureString -AsPlainText -Force $PSBoundParameters[$ParamKey])) }
+                        'InputObject' { $params.add('Base64Data', $InputObject) }
+                    }
+                }
+                else
+                {
+                    $params.add($ParamKey, $PSBoundParameters[$ParamKey])
+                }
+            }
 
-    UnProtect-Datum @params
-
+            $result = UnProtect-Datum @params
+            $script:DecryptedPasswords.$InputObject = $result
+            return $result
+        }
+    }
 }
